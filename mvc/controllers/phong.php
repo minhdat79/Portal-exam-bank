@@ -1,24 +1,25 @@
 <?php
 require_once 'vendor/autoload.php';
 require_once 'vendor/phpoffice/phpexcel/Classes/PHPExcel/IOFactory.php';
-class Module extends Controller
+
+class Phong extends Controller
 {
-    public $nhomModel;
+    public $phongModel;
 
     function __construct()
     {
-        $this->nhomModel = $this->model("PhongModel");
+        $this->phongModel = $this->model("PhongModel");
         parent::__construct();
         require_once "./mvc/core/Pagination.php";
     }
 
     public function default()
     {
-        if (AuthCore::checkPermission("hocphan", "view")) {
+        if (AuthCore::checkPermission("phong", "view")) {
             $this->view("main_layout", [
-                "Page" => "module",
-                "Title" => "Quản lý nhóm học phần",
-                "Script" => "module",
+                "Page" => "phong", // Đã đổi Page
+                "Title" => "Quản lý phòng ban", // Đã đổi Title
+                "Script" => "phong", // Đã đổi Script
                 "Plugin" => [
                     "sweetalert2" => 1,
                     "select" => 1,
@@ -32,11 +33,12 @@ class Module extends Controller
 
     public function detail($maphong)
     {
-        $chitietphong = $this->nhomModel->getDetailGroup($maphong);
-        if (AuthCore::checkPermission("hocphan", "view") && $_SESSION['user_id'] == $chitietphong['giangvien']) {
+        $chitietphong = $this->phongModel->getDetailGroup($maphong);
+        // Đổi giangvien thành truongphong
+        if (AuthCore::checkPermission("phong", "view") && $_SESSION['user_id'] == $chitietphong['truongphong']) {
             $this->view("main_layout", [
                 "Page" => "class_detail",
-                "Title" => "Quản lý nhóm",
+                "Title" => "Quản lý chi tiết phòng",
                 "Plugin" => [
                     "datepicker" => 1,
                     "flatpickr" => 1,
@@ -58,7 +60,7 @@ class Module extends Controller
         if ($_SERVER['REQUEST_METHOD'] == "POST") {
             $hienthi = $_POST['hienthi'];
             $user_id = $_SESSION['user_id'];
-            $result = $this->nhomModel->getBySubject($user_id, $hienthi);
+            $result = $this->phongModel->getBySubject($user_id, $hienthi);
             echo json_encode($result);
         } else
             echo json_encode(false);
@@ -66,12 +68,12 @@ class Module extends Controller
 
     public function add()
     {
-        if ($_SERVER["REQUEST_METHOD"] == "POST" && AuthCore::checkPermission("hocphan", "create")) {
+        if ($_SERVER["REQUEST_METHOD"] == "POST" && AuthCore::checkPermission("phong", "create")) {
             $tenphong = $_POST['tenphong'];
             $ghichu = $_POST['ghichu'];
             $chude = $_POST['chude'];
-            $giangvien = $_SESSION['user_id'];
-            $result = $this->nhomModel->create($tenphong, $ghichu, $giangvien, $chude);
+            $truongphong = $_SESSION['user_id']; // Đã đổi từ giangvien
+            $result = $this->phongModel->create($tenphong, $ghichu, $truongphong, $chude);
             echo $result;
         } else
             echo json_encode(false);
@@ -79,9 +81,9 @@ class Module extends Controller
 
     public function delete()
     {
-        if ($_SERVER["REQUEST_METHOD"] == "POST" && AuthCore::checkPermission("hocphan", "delete")) {
+        if ($_SERVER["REQUEST_METHOD"] == "POST" && AuthCore::checkPermission("phong", "delete")) {
             $maphong = $_POST['maphong'];
-            $result = $this->nhomModel->delete($maphong);
+            $result = $this->phongModel->delete($maphong);
             echo $result;
         } else
             echo json_encode(false);
@@ -89,12 +91,12 @@ class Module extends Controller
 
     public function update()
     {
-        if ($_SERVER["REQUEST_METHOD"] == "POST" && AuthCore::checkPermission("hocphan", "update")) {
+        if ($_SERVER["REQUEST_METHOD"] == "POST" && AuthCore::checkPermission("phong", "update")) {
             $maphong = $_POST['maphong'];
             $tenphong = $_POST['tenphong'];
             $ghichu = $_POST['ghichu'];
             $chude = $_POST['chude'];
-            $result = $this->nhomModel->update($maphong, $tenphong, $ghichu, $chude);
+            $result = $this->phongModel->update($maphong, $tenphong, $ghichu, $chude);
             echo json_encode($result);
         } else
             echo json_encode(false);
@@ -102,10 +104,10 @@ class Module extends Controller
 
     public function hide()
     {
-        if ($_SERVER["REQUEST_METHOD"] == "POST" && AuthCore::checkPermission("hocphan", "create")) {
+        if ($_SERVER["REQUEST_METHOD"] == "POST" && AuthCore::checkPermission("phong", "create")) {
             $maphong = $_POST['maphong'];
             $giatri = $_POST['giatri'];
-            $result = $this->nhomModel->hide($maphong, $giatri);
+            $result = $this->phongModel->hide($maphong, $giatri);
             echo $result;
         } else
             echo json_encode(false);
@@ -113,64 +115,47 @@ class Module extends Controller
 
     public function getDetail()
     {
-        if ($_SERVER["REQUEST_METHOD"] == "POST" && AuthCore::checkPermission("hocphan", "create")) {
+        if ($_SERVER["REQUEST_METHOD"] == "POST" && AuthCore::checkPermission("phong", "create")) {
             $maphong = $_POST['maphong'];
-            $result = $this->nhomModel->getById($maphong);
+            $result = $this->phongModel->getById($maphong);
             echo json_encode($result);
         } else
             echo json_encode(false);
     }
 
+    // Đã loại bỏ updateInvitedCode và getInvitedCode vì hệ thống SDTC không dùng mã mời (mamoi) nữa
 
-    public function updateInvitedCode()
-    {
-        if($_SERVER["REQUEST_METHOD"] == "POST" && AuthCore::checkPermission("hocphan", "create")) {
-            $maphong = $_POST['maphong'];
-            $result = $this->nhomModel->updateInvitedCode($maphong);
-            echo $result;
-        }
-    }
-
-    public function getInvitedCode()
-    {
-        if($_SERVER["REQUEST_METHOD"] == "POST" && AuthCore::checkPermission("hocphan", "view")) {
-            $maphong = $_POST['maphong'];
-            $result = $this->nhomModel->getInvitedCode($maphong);
-            echo json_encode($result);
-        }
-    }
-
-    public function getSvList() 
+    public function getUserList() 
     {
         AuthCore::checkAuthentication();
         if($_SERVER["REQUEST_METHOD"] == "POST") {
             $maphong = $_POST['maphong'];
-            $result = $this->nhomModel->getSvList($maphong);
+            $result = $this->phongModel->getSvList($maphong); // Tạm giữ tên hàm model cũ để đỡ lỗi
             echo json_encode($result);
         }
     }
 
 
-    public function addSV()
+    public function addUser()
     {
         AuthCore::checkAuthentication();
         if($_SERVER["REQUEST_METHOD"] == "POST") {
             $maphong = $_POST['maphong'];
-            $mssv = $_POST['mssv'];
+            $manguoidung = $_POST['manguoidung']; // Đổi từ mssv
             $hoten = $_POST['hoten'];
             $password = $_POST['password'];
-            $result = $this->nhomModel->addSV($mssv,$hoten,$password);
-            $joinGroup = $this->nhomModel->join($maphong,$mssv);
+            $result = $this->phongModel->addSV($manguoidung,$hoten,$password);
+            $joinGroup = $this->phongModel->join($maphong,$manguoidung);
             echo $joinGroup;
         }
     }
 
-    public function addSvGroup(){
+    public function addUserGroup(){
         AuthCore::checkAuthentication();
         if($_SERVER["REQUEST_METHOD"] == "POST") {
             $maphong = $_POST['maphong'];
-            $mssv = $_POST['mssv'];
-            $joinGroup = $this->nhomModel->join($maphong,$mssv);
+            $manguoidung = $_POST['manguoidung']; // Đổi từ mssv
+            $joinGroup = $this->phongModel->join($maphong,$manguoidung);
             echo ($joinGroup);
         }
     }
@@ -180,27 +165,23 @@ class Module extends Controller
         AuthCore::checkAuthentication();
         if($_SERVER["REQUEST_METHOD"] == "POST") {
             $maphong = $_POST['maphong'];
-            $mssv = $_POST['mssv'];
-            $result = $this->nhomModel->checkAcc($mssv,$maphong);
+            $manguoidung = $_POST['manguoidung'];
+            $result = $this->phongModel->checkAcc($manguoidung,$maphong);
             echo $result;
         }
     }
     
-
-    public function exportExcelStudentS()
+    public function exportExcelUsers()
     {
         AuthCore::checkAuthentication();
         if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $maphong = $_POST['maphong'];
-            $result = $this->nhomModel->getStudentByGroup($maphong);
-            //Khởi tạo đối tượng
+            $result = $this->phongModel->getStudentByGroup($maphong);
+            
             $excel = new PHPExcel();
-            //Chọn trang cần ghi (là số từ 0->n)
             $excel->setActiveSheetIndex(0);
-            //Tạo tiêu đề cho trang. (có thể không cần)
             $excel->getActiveSheet()->setTitle("Danh sách kết quả");
 
-            //Xét chiều rộng cho từng, nếu muốn set height thì dùng setRowHeight()
             $excel->getActiveSheet()->getColumnDimension('A')->setWidth(15);
             $excel->getActiveSheet()->getColumnDimension('B')->setWidth(30);
             $excel->getActiveSheet()->getColumnDimension('C')->setWidth(30);
@@ -208,8 +189,6 @@ class Module extends Controller
             $excel->getActiveSheet()->getColumnDimension('E')->setWidth(20);
             $excel->getActiveSheet()->getColumnDimension('F')->setWidth(20);
 
-
-            //Xét in đậm cho khoảng cột
             $phpColor = new PHPExcel_Style_Color();
             $phpColor->setRGB('FFFFFF');
             $excel->getActiveSheet()->getStyle('A1:F1')->getFont()->setBold(true);
@@ -223,26 +202,17 @@ class Module extends Controller
                 )
             );
             $excel->getActiveSheet()->getStyle('A1:F1')->getAlignment()->applyFromArray(
-                array('horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER,
-                )
+                array('horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER)
             );
-            ;
-            //Tạo tiêu đề cho từng cột
-//Vị trí có dạng như sau:
-            /**
-             * |A1|B1|C1|..|n1|
-             * |A2|B2|C2|..|n1|
-             * |..|..|..|..|..|
-             * |An|Bn|Cn|..|nn|
-             */
-            $excel->getActiveSheet()->setCellValue('A1', 'MSSV');
+
+            // Đổi tiêu đề MSSV thành Mã NV
+            $excel->getActiveSheet()->setCellValue('A1', 'Mã NV');
             $excel->getActiveSheet()->setCellValue('B1', 'Họ và tên');
             $excel->getActiveSheet()->setCellValue('C1', 'Email');
             $excel->getActiveSheet()->setCellValue('D1', 'Ngày tham gia');
             $excel->getActiveSheet()->setCellValue('E1', 'Ngày Sinh');
             $excel->getActiveSheet()->setCellValue('F1', 'Giới tính');
-            // thực hiện thêm dữ liệu vào từng ô bằng vòng lặp
-            // dòng bắt đầu = 2
+            
             $numRow = 2;
             foreach ($result as $row) {
                 $excel->getActiveSheet()->setCellValue('A' . $numRow, $row["id"]);
@@ -259,10 +229,8 @@ class Module extends Controller
                 }
 
                 $excel->getActiveSheet()->getStyle("A" . $numRow . ":F" . "$numRow")->getAlignment()->applyFromArray(
-                    array('horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER,
-                    )
+                    array('horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER)
                 );
-                ;
                 $numRow++;
             }
             ob_start();
@@ -283,7 +251,7 @@ class Module extends Controller
         AuthCore::checkAuthentication();
         if($_SERVER["REQUEST_METHOD"] == "POST") {
             $maphong = $_POST['maphong'];
-            $result = $this->nhomModel->getGroupSize($maphong);
+            $result = $this->phongModel->getGroupSize($maphong);
             echo $result;
         }
     }
@@ -293,11 +261,10 @@ class Module extends Controller
         AuthCore::checkAuthentication();
         if($_SERVER["REQUEST_METHOD"] == "POST") {
             $maphong = $_POST['maphong'];
-            $mssv = $_POST['manguoidung'];
-            $result = $this->nhomModel->kickUser($maphong,$mssv);
+            $manguoidung = $_POST['manguoidung'];
+            $result = $this->phongModel->kickUser($maphong,$manguoidung);
             echo $result;
         }
     }
-
 }
 ?>

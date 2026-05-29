@@ -1,14 +1,14 @@
 <?php
 require_once "./mvc/core/AuthCore.php";
 
-class Subject extends Controller
+class ChuDe extends Controller
 {
-    public $monHocModel;
+    public $chuDeModel;
     public $chuongModel;
 
     public function __construct()
     {
-        $this->monHocModel = $this->model("ChuDeModel");
+        $this->chuDeModel = $this->model("ChuDeModel");
         $this->chuongModel = $this->model("ChuongModel");
         require_once "./mvc/core/Pagination.php";
     }
@@ -17,9 +17,9 @@ class Subject extends Controller
     {
         if (AuthCore::checkPermission("chude", "view")) {
             $this->view("main_layout", [
-                "Page" => "subject",
-                "Title" => "Quản lý môn học",
-                "Script" => "subject",
+                "Page" => "chude",
+                "Title" => "Quản lý chủ đề",
+                "Script" => "chude",
                 "Plugin" => [
                     "sweetalert2" => 1,
                     "jquery-validate" => 1,
@@ -32,20 +32,18 @@ class Subject extends Controller
 
     public function add()
     {
-        $mamon = $_POST['mamon'];
-        $tenmon = $_POST['tenmon'];
-        $sotinchi = $_POST['sotinchi'];
-        $sotietlythuyet = $_POST['sotietlythuyet'];
-        $sotietthuchanh = $_POST['sotietthuchanh'];
-        $result = $this->monHocModel->create($mamon, $tenmon, $sotinchi, $sotietlythuyet, $sotietthuchanh);
+        // Loại bỏ các trường rác: số tín chỉ, tiết lý thuyết...
+        $machude = $_POST['machude'];
+        $tenchude = $_POST['tenchude'];
+        $result = $this->chuDeModel->create($machude, $tenchude);
         echo $result;
     }
 
-    public function checkSubject()
+    public function checkTopic()
     {
         if ($_SERVER["REQUEST_METHOD"] == "POST") {
-            $mamon = $_POST['mamon'];
-            $result = $this->monHocModel->checkSubject($mamon);
+            $machude = $_POST['machude'];
+            $result = $this->chuDeModel->checkSubject($machude);
             echo json_encode($result);
         }
     }
@@ -53,33 +51,30 @@ class Subject extends Controller
     public function update()
     {
         $id = $_POST['id'];
-        $mamon = $_POST['mamon'];
-        $tenmon = $_POST['tenmon'];
-        $sotinchi = $_POST['sotinchi'];
-        $sotietlythuyet = $_POST['sotietlythuyet'];
-        $sotietthuchanh = $_POST['sotietthuchanh'];
-        $result = $this->monHocModel->update($id, $mamon, $tenmon, $sotinchi, $sotietlythuyet, $sotietthuchanh);
+        $machude = $_POST['machude'];
+        $tenchude = $_POST['tenchude'];
+        $result = $this->chuDeModel->update($id, $machude, $tenchude);
         echo $result;
     }
 
     public function delete()
     {
-        $mamon = $_POST['mamon'];
-        $result = $this->monHocModel->delete($mamon);
+        $machude = $_POST['machude'];
+        $result = $this->chuDeModel->delete($machude);
         echo $result;
     }
 
-    public function getSubjectAssignment()
+    public function getTopicAssignment()
     {
         $id = $_SESSION['user_id'];
-        $data = $this->monHocModel->getAllSubjectAssignment($id);
+        $data = $this->chuDeModel->getAllSubjectAssignment($id);
         echo json_encode($data);
     }
 
     public function getDetail()
     {
         if ($_SERVER["REQUEST_METHOD"] == "POST") {
-            $data = $this->monHocModel->getById($_POST['mamon']);
+            $data = $this->chuDeModel->getById($_POST['machude']);
             echo json_encode($data);
         }
         echo false;
@@ -119,14 +114,15 @@ class Subject extends Controller
     public function search()
     {
         if ($_SERVER["REQUEST_METHOD"] == "POST") {
-            $result = $this->monHocModel->search($_POST['input']);
+            $result = $this->chuDeModel->search($_POST['input']);
             echo json_encode($result);
         }
     }
 
     public function getQuery($filter, $input, $args)
     {
-        $result = $this->monHocModel->getQuery($filter, $input, $args);
+        $result = $this->chuDeModel->getQuery($filter, $input, $args);
         return $result;
     }
 }
+?>
