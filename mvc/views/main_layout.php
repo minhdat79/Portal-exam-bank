@@ -7,11 +7,11 @@
         include "inc/navbar.php";
         include "inc/header.php";
         ?>
-        <!-- Main Container -->
+
         <main id="main-container">
-        <!-- Page Content -->
+
         <?php include "./mvc/views/pages/".$data['Page'].".php" ?>
-        <!-- END Page Content -->
+
         </main>
         <?php include "inc/footer.php" ?>
     </div>

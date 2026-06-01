@@ -88,7 +88,7 @@
                                     <h3 class="block-title">Giao cho</h3>
                                     <div class="block-option">
                                         <select class="js-select2 form-select" id="phong-hp" name="phong-hp"
-                                            style="width: 100%;" data-placeholder="Chọn nhóm học phần giảng dạy..." <?php if($data["Action"] == "update") echo "disabled"?>>
+                                            style="width: 100%;" data-placeholder="Chọn chủ đề nghiệp vụ..." <?php if($data["Action"] == "update") echo "disabled"?>>
                                         </select>
                                     </div>
                                 </div>

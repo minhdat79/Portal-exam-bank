@@ -1,11 +1,11 @@
 <div class="content">
     <div class="block block-rounded">
         <div class="block-header block-header-default">
-            <h3 class="block-title">Danh sách môn học</h3>
+            <h3 class="block-title">Danh sách chủ đề nghiệp vụ</h3>
             <div class="block-options">
                 <button type="button" class="btn btn-hero btn-primary" data-bs-toggle="modal"
                     data-bs-target="#modal-add-subject" data-role="chude" data-action="create"><i
-                        class="fa-regular fa-plus"></i> Thêm môn học</button>
+                        class="fa-regular fa-plus"></i> Thêm chủ đề</button>
             </div>
         </div>
         <div class="block-content">
@@ -13,7 +13,7 @@
                 <div class="mb-4">
                     <div class="input-group">
                         <input type="text" class="form-control form-control-alt" id="search-input" name="search-input"
-                            placeholder="Tìm kiếm môn học...">
+                            placeholder="Tìm kiếm chủ đề...">
                         <button class="input-group-text bg-body border-0 btn-search">
                             <i class="fa fa-search"></i>
                         </button>
@@ -24,11 +24,8 @@
                 <table class="table table-vcenter">
                     <thead>
                         <tr>
-                            <th class="text-center">Mã môn</th>
-                            <th>Tên môn</th>
-                            <th class="d-none d-sm-table-cell text-center">Số tín chỉ</th>
-                            <th class="d-none d-sm-table-cell text-center">Số tiết lý thuyết</th>
-                            <th class="d-none d-sm-table-cell text-center">Số tiết thực hành</th>
+                            <th class="text-center">Mã chủ đề</th>
+                            <th>Tên chủ đề</th>
                             <th class="text-center col-header-action">Hành động</th>
                         </tr>
                     </thead>
@@ -47,8 +44,8 @@
         <div class="modal-content">
             <div class="block block-rounded block-themed block-transparent mb-0">
                 <div class="block-header bg-primary-dark">
-                    <h3 class="block-title add-subject-element">Thêm môn học</h3>
-                    <h3 class="block-title update-subject-element">Chỉnh sửa môn học</h3>
+                    <h3 class="block-title add-subject-element">Thêm chủ đề</h3>
+                    <h3 class="block-title update-subject-element">Chỉnh sửa chủ đề</h3>
                     <div class="block-options">
                         <button type="button" class="btn-block-option" data-bs-dismiss="modal" aria-label="Close">
                             <i class="fa fa-fw fa-times"></i>
@@ -57,33 +54,14 @@
                 </div>
                 <form class="block-content fs-sm form-add-subject">
                     <div class="mb-3">
-                        <label for="" class="form-label">Mã môn học</label>
+                        <label for="" class="form-label">Mã chủ đề</label>
                         <input type="text" class="form-control form-control-alt" name="machude" id="machude"
-                            placeholder="Nhập mã môn học">
+                            placeholder="Nhập mã chủ đề">
                     </div>
                     <div class="mb-3">
-                        <label for="" class="form-label">Tên môn học</label>
+                        <label for="" class="form-label">Tên chủ đề</label>
                         <input type="text" class="form-control form-control-alt" name="tenchude" id="tenchude"
-                            placeholder="Nhập tên môn học">
-                    </div>
-                    <div class="mb-3">
-                        <label for="" class="form-label">Tổng số tín chỉ</label>
-                        <input type="number" class="form-control form-control-alt" name="sotinchi" id="sotinchi"
-                            placeholder="Nhập số tín chỉ">
-                    </div>
-                    <div class="mb-3">
-                        <div class="row">
-                            <div class="col-6">
-                                <label for="" class="form-label">Số tiết lý thuyết</label>
-                                <input type="number" class="form-control form-control-alt" name="sotiet_lt"
-                                    id="sotiet_lt" placeholder="Nhập số tiết lý thuyết">
-                            </div>
-                            <div class="col-6">
-                                <label for="" class="form-label">Số tiết thực hành</label>
-                                <input type="number" class="form-control form-control-alt" name="sotiet_th"
-                                    id="sotiet_th" placeholder="Nhập số tiết thực hành">
-                            </div>
-                        </div>
+                            placeholder="Nhập tên chủ đề">
                     </div>
                 </form>
                 <div class="block-content block-content-full text-end bg-body">

@@ -13,32 +13,14 @@ Dashmix.onLoad(() =>
             tenchude: {
               required: !0,
             },
-            sotinchi: {
-              required: !0,
-            },
-            sotiet_lt: {
-              required: !0,
-            },
-            sotiet_th: {
-              required: !0,
-            },
           },
           messages: {
             machude: {
-              required: "Vui lòng nhập mã môn học",
-              digits: "Mã môn học phải là các ký tự số",
+              required: "Vui lòng nhập mã chủ đề",
+              digits: "Mã chủ đề phải là các ký tự số",
             },
             tenchude: {
-              required: "Vui lòng cung cấp tên môn học",
-            },
-            sotinchi: {
-              required: "Vui lòng cho biết số tín chỉ",
-            },
-            sotiet_lt: {
-              required: "Vui lòng nhập số tiết lý thuyết",
-            },
-            sotiet_th: {
-              required: "Vui lòng nhập số tiết thực hành",
+              required: "Vui lòng cung cấp tên chủ đề",
             },
           },
         });
@@ -56,20 +38,17 @@ function showData(subjects) {
     html += `<tr tid="${subject.machude}">
               <td class="text-center fs-sm"><strong>${subject.machude}</strong></td>
               <td>${subject.tenchude}</td>
-              <td class="d-none d-sm-table-cell text-center fs-sm">${subject.sotinchi}</td>
-              <td class="d-none d-sm-table-cell text-center fs-sm">${subject.sotietlythuyet}</td>
-              <td class="d-none d-sm-table-cell text-center fs-sm">${subject.sotietthuchanh}</td>
               <td class="text-center col-action">
                   <a data-role="chuong" data-action="view" class="btn btn-sm btn-alt-secondary subject-info" data-bs-toggle="modal" data-bs-target="#modal-chapter" href="javascript:void(0)"
                       data-bs-toggle="tooltip" aria-label="Thêm chương" data-bs-original-title="Chi tiết chương" data-id="${subject.machude}">
                       <i class="fa fa-circle-info"></i>
                   </a>
                   <a data-role="chude" data-action="update" class="btn btn-sm btn-alt-secondary btn-edit-subject" href="javascript:void(0)"
-                      data-bs-toggle="tooltip" aria-label="Sửa môn học" data-bs-original-title="Sửa môn học" data-id="${subject.machude}">
+                      data-bs-toggle="tooltip" aria-label="Sửa chủ đề" data-bs-original-title="Sửa chủ đề" data-id="${subject.machude}">
                       <i class="fa fa-fw fa-pencil"></i>
                   </a>
                   <a data-role="chude" data-action="delete" class="btn btn-sm btn-alt-secondary btn-delete-subject" href="javascript:void(0)"
-                      data-bs-toggle="tooltip" aria-label="Xoá môn học" data-bs-original-title="Xoá môn học" data-id="${subject.machude}">
+                      data-bs-toggle="tooltip" aria-label="Xoá chủ đề" data-bs-original-title="Xoá chủ đề" data-id="${subject.machude}">
                       <i class="fa fa-fw fa-times"></i>
                   </a>
               </td>
@@ -86,13 +65,13 @@ $(document).ready(function () {
     $(".add-subject-element").show();
   });
 
-  function checkTonTai(mamon) {
+  function checkTonTai(machude) {
     let check = true;
     $.ajax({
       type: "post",
-      url: "./subject/checkSubject",
+      url: "./chude/checkTopic",
       data: {
-        mamon: mamon,
+        machude: machude,
       },
       async: false,
       dataType: "json",
@@ -101,7 +80,7 @@ $(document).ready(function () {
           Dashmix.helpers("jq-notify", {
             type: "danger",
             icon: "fa fa-times me-1",
-            message: `Môn học đã tồn tại!`,
+            message: `Chủ đề đã tồn tại!`,
           });
           check = false;
         }
@@ -111,24 +90,21 @@ $(document).ready(function () {
   }
 
   $("#add_subject").on("click", function () {
-    let mamon = $("#machude").val();
-    if ($(".form-add-subject").valid() && checkTonTai(mamon)) {
+    let machude = $("#machude").val();
+    if ($(".form-add-subject").valid() && checkTonTai(machude)) {
       $.ajax({
         type: "post",
-        url: "./subject/add",
+        url: "./chude/add",
         data: {
-          mamon: mamon,
-          tenmon: $("#tenchude").val(),
-          sotinchi: $("#sotinchi").val(),
-          sotietlythuyet: $("#sotiet_lt").val(),
-          sotietthuchanh: $("#sotiet_th").val(),
+          machude: machude,
+          tenchude: $("#tenchude").val(),
         },
         success: function (response) {
           if (response) {
             Dashmix.helpers("jq-notify", {
               type: "success",
               icon: "fa fa-check me-1",
-              message: "Thêm môn học thành công!",
+              message: "Thêm chủ đề thành công!",
             });
             $("#modal-add-subject").modal("hide");
             mainPagePagination.getPagination(
@@ -139,7 +115,7 @@ $(document).ready(function () {
             Dashmix.helpers("jq-notify", {
               type: "danger",
               icon: "fa fa-times me-1",
-              message: "Thêm môn học không thành công!",
+              message: "Thêm chủ đề không thành công!",
             });
           }
         },
@@ -150,21 +126,18 @@ $(document).ready(function () {
   $(document).on("click", ".btn-edit-subject", function () {
     $(".update-subject-element").show();
     $(".add-subject-element").hide();
-    let mamon = $(this).data("id");
+    let machude = $(this).data("id");
     $.ajax({
       type: "post",
-      url: "./subject/getDetail",
+      url: "./chude/getDetail",
       data: {
-        mamon: mamon,
+        machude: machude,
       },
       dataType: "json",
       success: function (response) {
         if (response) {
           $("#machude").val(response.machude),
             $("#tenchude").val(response.tenchude),
-            $("#sotinchi").val(response.sotinchi),
-            $("#sotiet_lt").val(response.sotietlythuyet),
-            $("#sotiet_th").val(response.sotietthuchanh),
             $("#modal-add-subject").modal("show"),
             $("#update_subject").data("id", response.machude);
         }
@@ -172,30 +145,28 @@ $(document).ready(function () {
     });
   });
 
-  // Đóng modal thì reset form
   $("#modal-add-subject").on("hidden.bs.modal", function () {
     $("#machude").val(""),
       $("#tenchude").val(""),
-      $("#sotinchi").val(""),
-      $("#sotiet_lt").val(""),
-      $("#sotiet_th").val(""),
       $("#update_subject").data("id", "");
   });
 
   $("#update_subject").click(function (e) {
     e.preventDefault();
-    let mamon = $(this).data("id");
-    if ($(".form-add-subject").valid() && checkTonTai(mamon)) {
+    let id = $(this).data("id");
+    let machude = $("#machude").val();
+
+    if ($(".form-add-subject").valid()) {
+      if (id !== machude && !checkTonTai(machude)) {
+        return;
+      }
       $.ajax({
         type: "post",
-        url: "./subject/update",
+        url: "./chude/update",
         data: {
-          id: mamon,
-          mamon: $("#machude").val(),
-          tenmon: $("#tenchude").val(),
-          sotinchi: $("#sotinchi").val(),
-          sotietlythuyet: $("#sotiet_lt").val(),
-          sotietthuchanh: $("#sotiet_th").val(),
+          id: id,
+          machude: machude,
+          tenchude: $("#tenchude").val(),
         },
         success: function (response) {
           if (response) {
@@ -203,7 +174,7 @@ $(document).ready(function () {
             Dashmix.helpers("jq-notify", {
               type: "success",
               icon: "fa fa-check me-1",
-              message: "Cập nhật môn học thành công!",
+              message: "Cập nhật chủ đề thành công!",
             });
             mainPagePagination.getPagination(
               mainPagePagination.option,
@@ -213,7 +184,7 @@ $(document).ready(function () {
             Dashmix.helpers("jq-notify", {
               type: "danger",
               icon: "fa fa-times me-1",
-              message: "Cập nhật môn học không thành công!",
+              message: "Cập nhật chủ đề không thành công!",
             });
           }
         },
@@ -235,7 +206,7 @@ $(document).ready(function () {
 
     e.fire({
       title: "Are you sure?",
-      text: "Bạn có chắc chắn muốn xoá nhóm môn học?",
+      text: "Bạn có chắc chắn muốn xoá chủ đề?",
       icon: "warning",
       showCancelButton: !0,
       customClass: {
@@ -254,19 +225,19 @@ $(document).ready(function () {
       if (t.value == true) {
         $.ajax({
           type: "post",
-          url: "./subject/delete",
+          url: "./chude/delete",
           data: {
-            mamon: trid,
+            machude: trid,
           },
           success: function (response) {
             if (response) {
-              e.fire("Deleted!", "Xóa môn học thành công!", "success");
+              e.fire("Deleted!", "Xóa chủ đề thành công!", "success");
               mainPagePagination.getPagination(
                 mainPagePagination.option,
                 mainPagePagination.valuePage.curPage
               );
             } else {
-              e.fire("Lỗi !", "Xoá môn học không thành công !)", "error");
+              e.fire("Lỗi !", "Xoá chủ đề không thành công !)", "error");
             }
           },
         });
@@ -293,7 +264,7 @@ $(document).ready(function () {
   function showChapter(machude) {
     $.ajax({
       type: "post",
-      url: "./subject/getAllChapter",
+      url: "./chude/getAllChapter",
       data: {
         machude: machude,
       },
@@ -354,7 +325,7 @@ $(document).ready(function () {
     } else {
       $.ajax({
         type: "post",
-        url: "./subject/addChapter",
+        url: "./chude/addChapter",
         data: {
           machude: machude,
           tenchuong: $("#name_chapter").val(),
@@ -378,7 +349,7 @@ $(document).ready(function () {
     let machuong = $(this).data("id");
     $.ajax({
       type: "post",
-      url: "./subject/chapterDelete",
+      url: "./chude/chapterDelete",
       data: {
         machuong: machuong,
       },
@@ -415,7 +386,7 @@ $(document).ready(function () {
     e.preventDefault();
     $.ajax({
       type: "post",
-      url: "./subject/updateChapter",
+      url: "./chude/updateChapter",
       data: {
         machuong: $("#machuong").val(),
         tenchuong: $("#name_chapter").val(),
@@ -443,7 +414,7 @@ $(document).ready(function () {
 
 // Pagination
 const mainPagePagination = new Pagination();
-mainPagePagination.option.controller = "subject";
+mainPagePagination.option.controller = "chude";
 mainPagePagination.option.model = "ChuDeModel";
 mainPagePagination.option.limit = 10;
 mainPagePagination.getPagination(

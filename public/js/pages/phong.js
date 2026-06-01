@@ -12,30 +12,18 @@ Dashmix.onLoad((() => class {
                 },
                 "mon-hoc": {
                     required: !0,
-                },
-                "nam-hoc": {
-                    required: !0
-                },
-                "hoc-ky": {
-                    required: !0,
-                },
+                }
             },
             messages: {
                 "ten-phong": {
-                    required: "Vui lòng nhập tên nhóm",
+                    required: "Vui lòng nhập tên phòng ban",
                 },
                 "ghi-chu": {
                     required: "Vui lòng không để trống trường này",
                 },
                 "mon-hoc": {
-                    required: "Vui lòng chọn môn học",
-                },
-                "nam-hoc": {
-                    required: "Vui lòng chọn năm học",
-                },
-                "hoc-ky": {
-                    required: "Vui lòng chọn học kỳ",
-                },
+                    required: "Vui lòng chọn chủ đề nghiệp vụ",
+                }
             }
         })
     }
@@ -60,7 +48,7 @@ $(document).ready(function () {
     function loadDataGroup(hienthi) {
         $.ajax({
             type: "post",
-            url: "./module/loadData",
+            url: "./phong/loadData", // Đã đổi module thành phong
             data: {
                 hienthi: hienthi
             },
@@ -75,7 +63,6 @@ $(document).ready(function () {
     loadDataGroup(mode);
 
     function showGroup(list) {
-        console.log(list)
         let html = "";
         let d = 0;
         if (list.length == 0) {
@@ -96,7 +83,7 @@ $(document).ready(function () {
                     if (nhom_item.hienthi == 1) {
                         btn_hide = `<a class="nav-main-link dropdown-item btn-hide-group" href="javascript:void(0)" data-id="${nhom_item.maphong}">
                             <i class="nav-main-link-icon si si-eye me-2 text-dark"></i>
-                            <span class="nav-main-link-name fw-normal">Ẩn nhóm</span>
+                            <span class="nav-main-link-name fw-normal">Ẩn phòng ban</span>
                         </a>`
                     } else {
                         btn_hide = `<a class="nav-main-link dropdown-item btn-unhide-group" href="javascript:void(0)" data-id="${nhom_item.maphong}">
@@ -115,18 +102,18 @@ $(document).ready(function () {
                                     <i class="si si-settings"></i>
                                     </button>
                                     <div class="dropdown-menu  fs-sm" aria-labelledby="dropdown-default-light" style="">
-                                    <a class="nav-main-link dropdown-item maphong" href="module/detail/${nhom_item.maphong}">
+                                    <a class="nav-main-link dropdown-item maphong" href="phong/detail/${nhom_item.maphong}">
                                         <i class="nav-main-link-icon si si-info me-2 text-dark"></i>
-                                        <span class="nav-main-link-name fw-normal">Danh sách sinh viên</span>
+                                        <span class="nav-main-link-name fw-normal">Danh sách nhân sự</span>
                                     </a>
-                                    <a class="nav-main-link dropdown-item btn-update-group" href="javascript:void(0)" data-id="${nhom_item.maphong}" data-role="hocphan" data-action="update">
+                                    <a class="nav-main-link dropdown-item btn-update-group" href="javascript:void(0)" data-id="${nhom_item.maphong}" data-role="phong" data-action="update">
                                         <i class="nav-main-link-icon si si-pencil me-2 text-dark"></i>
                                         <span class="nav-main-link-name fw-normal">Sửa thông tin</span>
                                     </a>
                                     ${btn_hide}
-                                    <a class="nav-main-link dropdown-item btn-delete-group" href="javascript:void(0)" data-id="${nhom_item.maphong}" data-role="hocphan" data-action="delete">
+                                    <a class="nav-main-link dropdown-item btn-delete-group" href="javascript:void(0)" data-id="${nhom_item.maphong}" data-role="phong" data-action="delete">
                                         <i class="nav-main-link-icon si si-trash me-2 text-danger"></i>
-                                        <span class="nav-main-link-name fw-normal text-danger">Xoá nhóm</span>
+                                        <span class="nav-main-link-name fw-normal text-danger">Xoá phòng</span>
                                     </a>
                                     </div>
                                 </div>
@@ -134,7 +121,7 @@ $(document).ready(function () {
                         </div>
                         <div class="block-content">
                             <p class="block-class-note">${nhom_item.ghichu}</p>
-                            <p class="Si-So">Sỉ số: <span>${nhom_item.siso}</span></p>
+                            <p class="Si-So">Nhân sự: <span>${nhom_item.siso}</span></p>
                         </div>
                         </div>
                     </div>`;
@@ -147,38 +134,36 @@ $(document).ready(function () {
     }
 
 
-    $.get(
-        "./subject/getSubjectAssignment",
-        function (data) {
-            let html = "<option></option>";
-            data.forEach((item) => {
-                html += `<option value="${item.machude}">${item.machude + " - " + item.tenchude}</option>`;
-            });
-            $("#mon-hoc").html(html);
-        },
-        "json"
-    );
-
-    function renderListYear() {
-        let html = "<option></option>";
-        let currentYear = new Date().getFullYear();
-        let start = currentYear - 10;
-        let end = currentYear + 10;
-        for (let i = start; i <= end; i++) {
-            html += `<option value="${i}">${i + " - " + (i + 1)}</option>`;
+ // Kéo toàn bộ Chủ đề và ép Select2 cập nhật giao diện
+    $.ajax({
+        type: "POST",
+        url: "./chude/search",
+        data: { input: "" },
+        dataType: "json",
+        success: function (data) {
+            let html = "<option value=''>Chọn chủ đề nghiệp vụ</option>";
+            if (data && data.length > 0) {
+                data.forEach((item) => {
+                    let ma = item.machude || item.mamon;
+                    let ten = item.tenchude || item.tenmon;
+                    html += `<option value="${ma}">${ma} - ${ten}</option>`;
+                });
+            } else {
+                html += "<option value=''>Không có dữ liệu chủ đề</option>";
+            }
+            
+            // QUAN TRỌNG NHẤT LÀ ĐOẠN NÀY: Phải có .trigger("change")
+            $("#mon-hoc").html(html).trigger("change");
         }
-        $("#nam-hoc").html(html);
-        $("#nam-hoc").val(currentYear).trigger("change")
-    }
-
-    renderListYear();
+    });
+    // Đã gỡ bỏ hàm renderListYear vì không dùng đến nữa
 
     $("#add-group").click(function (e) {
         e.preventDefault();
         if($(".form-add-group").valid()) {
             $.ajax({
                 type: "post",
-                url: "./module/add",
+                url: "./phong/add", // Đã đổi API
                 data: {
                     tenphong: $("#ten-phong").val(),
                     ghichu: $("#ghi-chu").val(),
@@ -188,9 +173,9 @@ $(document).ready(function () {
                     if (response) {
                         $("#modal-add-group").modal("hide");
                         loadDataGroup(mode);
-                        Dashmix.helpers('jq-notify', { type: 'success', icon: 'fa fa-check me-1', message: 'Thêm nhóm thành công!' });
+                        Dashmix.helpers('jq-notify', { type: 'success', icon: 'fa fa-check me-1', message: 'Thêm phòng ban thành công!' });
                     } else {
-                        Dashmix.helpers('jq-notify', { type: 'danger', icon: 'fa fa-times me-1', message: 'Thêm nhóm không thành công!' });
+                        Dashmix.helpers('jq-notify', { type: 'danger', icon: 'fa fa-times me-1', message: 'Thêm phòng ban không thành công!' });
                     }
                 }
             });
@@ -202,7 +187,7 @@ $(document).ready(function () {
         swalWithBootstrapButtons
             .fire({
                 title: "Are you sure?",
-                text: "Bạn có chắc chắn muốn ẩn hết các nhóm môn học này không!",
+                text: "Bạn có chắc chắn muốn ẩn hết các phòng ban này không!",
                 icon: "warning",
                 showCancelButton: true,
                 confirmButtonText: "Chắc chắn!",
@@ -214,7 +199,7 @@ $(document).ready(function () {
                         updateHide(item.maphong, 0);
                     });
                     groups.splice(index, 1);
-                    Dashmix.helpers('jq-notify', { type: 'success', icon: 'fa fa-check me-1', message: 'Ẩn nhóm thành công!' });
+                    Dashmix.helpers('jq-notify', { type: 'success', icon: 'fa fa-check me-1', message: 'Ẩn phòng ban thành công!' });
                     showGroup(groups);
                 }
             });
@@ -225,7 +210,7 @@ $(document).ready(function () {
         swalWithBootstrapButtons
             .fire({
                 title: "Are you sure?",
-                text: "Bạn có chắc chắn muốn huỷ ẩn hết các nhóm môn học này không!",
+                text: "Bạn có chắc chắn muốn huỷ ẩn hết các phòng ban này không!",
                 icon: "warning",
                 showCancelButton: true,
                 confirmButtonText: "Chắc chắn!",
@@ -237,7 +222,7 @@ $(document).ready(function () {
                         updateHide(item.maphong, 1);
                     });
                     groups.splice(index, 1);
-                    Dashmix.helpers('jq-notify', { type: 'success', icon: 'fa fa-check me-1', message: 'Ẩn nhóm thành công!' });
+                    Dashmix.helpers('jq-notify', { type: 'success', icon: 'fa fa-check me-1', message: 'Huỷ ẩn thành công!' });
                     showGroup(groups);
                 }
             });
@@ -246,18 +231,18 @@ $(document).ready(function () {
     $(document).on("click", ".btn-delete-group", function () {
         swalWithBootstrapButtons
             .fire({
-                title: "Are you sure?",
-                text: "You won't be able to revert this!",
+                title: "Xác nhận xoá?",
+                text: "Dữ liệu sẽ không thể khôi phục!",
                 icon: "warning",
                 showCancelButton: true,
-                confirmButtonText: "Yes, delete it!",
-                cancelButtonText: "No, cancel!",
+                confirmButtonText: "Có, xoá ngay!",
+                cancelButtonText: "Không, huỷ bỏ!",
             })
             .then((result) => {
                 if (result.isConfirmed) {
                     $.ajax({
                         type: "post",
-                        url: "./module/delete",
+                        url: "./phong/delete", // Đã cập nhật
                         data: {
                             maphong: $(this).data("id"),
                         },
@@ -265,7 +250,7 @@ $(document).ready(function () {
                             if (response) {
                                 swalWithBootstrapButtons.fire(
                                     "Xoá thành công!",
-                                    "Nhóm đã được xoá thành công",
+                                    "Phòng ban đã được xoá thành công",
                                     "success"
                                 );
                                 loadDataGroup(mode);
@@ -281,9 +266,9 @@ $(document).ready(function () {
         updateHide(maphong, 0).then(response => {
             removeItem(maphong);
             showGroup(groups);
-            Dashmix.helpers('jq-notify', { type: 'success', icon: 'fa fa-check me-1', message: 'Ẩn nhóm thành công!' });
+            Dashmix.helpers('jq-notify', { type: 'success', icon: 'fa fa-check me-1', message: 'Ẩn phòng ban thành công!' });
         }).catch(error => {
-            Dashmix.helpers('jq-notify', { type: 'danger', icon: 'fa fa-times me-1', message: 'Ẩn nhóm không thành công!' });
+            Dashmix.helpers('jq-notify', { type: 'danger', icon: 'fa fa-times me-1', message: 'Ẩn không thành công!' });
         });
     });
 
@@ -303,9 +288,9 @@ $(document).ready(function () {
         updateHide(maphong, 1).then(response => {
             removeItem(maphong);
             showGroup(groups);
-            Dashmix.helpers('jq-notify', { type: 'success', icon: 'fa fa-check me-1', message: 'Huỷ ẩn nhóm thành công!' });
+            Dashmix.helpers('jq-notify', { type: 'success', icon: 'fa fa-check me-1', message: 'Huỷ ẩn phòng ban thành công!' });
         }).catch(error => {
-            Dashmix.helpers('jq-notify', { type: 'danger', icon: 'fa fa-times me-1', message: 'Huỷ ẩn nhóm không thành công!' });
+            Dashmix.helpers('jq-notify', { type: 'danger', icon: 'fa fa-times me-1', message: 'Huỷ ẩn không thành công!' });
         });
     });
 
@@ -313,7 +298,7 @@ $(document).ready(function () {
         return new Promise((resolve, reject) => {
             $.ajax({
                 type: "post",
-                url: "./module/hide",
+                url: "./phong/hide", // Đã cập nhật
                 data: {
                     maphong: maphong,
                     giatri: giatri
@@ -336,7 +321,7 @@ $(document).ready(function () {
         $("#update-group").data("id", id)
         $.ajax({
             type: "post",
-            url: "./module/getDetail",
+            url: "./phong/getDetail", // Đã cập nhật
             data: {
                 maphong: id
             },
@@ -354,7 +339,7 @@ $(document).ready(function () {
         if($(".form-add-group").valid()) { 
             $.ajax({
                 type: "post",
-                url: "./module/update",
+                url: "./phong/update", // Đã cập nhật
                 data: {
                     maphong: $(this).data("id"),
                     tenphong: $("#ten-phong").val(),
@@ -362,13 +347,12 @@ $(document).ready(function () {
                     chude: $("#mon-hoc").val()
                 },
                 success: function (response) {
-                    console.log(response)
-                    if (response == "true") {
+                    if (response == "true" || response == true) { // Bắt linh hoạt kiểu dữ liệu trả về
                         $("#modal-add-group").modal("hide");
                         loadDataGroup(mode);
-                        Dashmix.helpers('jq-notify', { type: 'success', icon: 'fa fa-check me-1', message: 'Cập nhật nhóm thành công!' });
+                        Dashmix.helpers('jq-notify', { type: 'success', icon: 'fa fa-check me-1', message: 'Cập nhật phòng ban thành công!' });
                     } else {
-                        Dashmix.helpers('jq-notify', { type: 'danger', icon: 'fa fa-times me-1', message: 'Cập nhật nhóm không thành công!' });
+                        Dashmix.helpers('jq-notify', { type: 'danger', icon: 'fa fa-times me-1', message: 'Cập nhật phòng ban không thành công!' });
                     }
                 }
             });
@@ -384,10 +368,8 @@ $(document).ready(function () {
     // Reset form khi đóng modal
     $("#modal-add-group").on('hidden.bs.modal', function () {
         $("#ten-phong").val(""),
-            $("#ghi-chu").val(""),
-            $("#mon-hoc").val("").trigger("change"),
-            $("#nam-hoc").val("").trigger("change"),
-            $("#hoc-ky").val("").trigger("change")
+        $("#ghi-chu").val(""),
+        $("#mon-hoc").val("").trigger("change")
     });
 
     // Thay đổi text khi nhấn vào dropdown
@@ -401,7 +383,6 @@ $(document).ready(function () {
     $("#form-search-group").on("input", function () {
         let result = [];
         let content = $(this).val().toLowerCase();
-        console.log(groups);
         for (let i = 0; i < groups.length; i++) {
             if (groups[i].machude.includes(content) || groups[i].tenchude.toLowerCase().includes(content)) {
                 result.push(groups[i]);

@@ -30,12 +30,13 @@ class ChuDe extends Controller
         } else $this->view("single_layout", ["Page" => "error/page_403", "Title" => "Lỗi !"]);
     }
 
-    public function add()
+public function add()
     {
-        // Loại bỏ các trường rác: số tín chỉ, tiết lý thuyết...
         $machude = $_POST['machude'];
         $tenchude = $_POST['tenchude'];
-        $result = $this->chuDeModel->create($machude, $tenchude);
+        
+        // Mẹo: Truyền số 0 vào 3 vị trí của tín chỉ, tiết LT, tiết TH để Model không bị lỗi thiếu tham số
+        $result = $this->chuDeModel->create($machude, $tenchude, 0, 0, 0);
         echo $result;
     }
 
@@ -48,12 +49,14 @@ class ChuDe extends Controller
         }
     }
 
-    public function update()
+   public function update()
     {
         $id = $_POST['id'];
         $machude = $_POST['machude'];
         $tenchude = $_POST['tenchude'];
-        $result = $this->chuDeModel->update($id, $machude, $tenchude);
+        
+        // Tương tự, nhét số 0 vào để lấp đầy tham số cũ
+        $result = $this->chuDeModel->update($id, $machude, $tenchude, 0, 0, 0);
         echo $result;
     }
 
@@ -64,11 +67,21 @@ class ChuDe extends Controller
         echo $result;
     }
 
-    public function getTopicAssignment()
+   public function getTopicAssignment()
     {
-        $id = $_SESSION['user_id'];
-        $data = $this->chuDeModel->getAllSubjectAssignment($id);
-        echo json_encode($data);
+        $data = $this->chuDeModel->search("");
+        
+       
+        $result = [];
+        if ($data) {
+            foreach ($data as $row) {
+                $result[] = [
+                    'machude' => isset($row['machude']) ? $row['machude'] : (isset($row['mamon']) ? $row['mamon'] : ''),
+                    'tenchude' => isset($row['tenchude']) ? $row['tenchude'] : (isset($row['tenmon']) ? $row['tenmon'] : '')
+                ];
+            }
+        }
+        echo json_encode($result);
     }
 
     public function getDetail()
@@ -80,7 +93,7 @@ class ChuDe extends Controller
         echo false;
     }
 
-    //Chapter
+
     public function getAllChapter()
     {
         $result = $this->chuongModel->getAll($_POST['machude']);
